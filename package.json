@@ -1,9 +1,15 @@
 {
   "name": "@andiandnovee/vue-export-table",
-  "version": "1.0.0",
-  "main": "./index.js",
-  "module": "./index.js",
-  "type": "module",
+  "version": "1.0.5",
+  "main": "dist/vue-export-table.umd.js",      
+  "module": "dist/vue-export-table.es.js",     
+  "exports": {
+    ".": {
+      "import": "./dist/vue-export-table.es.js",
+      "require": "./dist/vue-export-table.umd.js"
+    }
+  },
+  "types": "./dist/index.d.ts",                
   "files": [
     "dist",
     "index.js"
@@ -12,14 +18,15 @@
     "build": "vite build"
   },
   "publishConfig": {
-  "access": "public"
-},
-
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+    "access": "public"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "xlsx": "^0.18.5"
+  },
   "dependencies": {
-    "vue": "^3.5.17",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
