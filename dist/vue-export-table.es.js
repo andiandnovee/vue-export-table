@@ -1,13 +1,19 @@
-import { ref as E, computed as v, watch as S, createElementBlock as u, openBlock as d, createElementVNode as t, toDisplayString as c, Fragment as b, renderList as h, renderSlot as D } from "vue";
-import { utils as _, writeFile as F } from "xlsx";
-import I from "jspdf";
-import L from "jspdf-autotable";
-const $ = (m, e) => {
-  const a = m.__vccOpts || m;
-  for (const [r, p] of e)
-    a[r] = p;
-  return a;
-}, O = { class: "flex justify-between items-center mb-4" }, B = { class: "text-lg font-semibold" }, M = { class: "overflow-x-auto rounded border" }, T = { class: "min-w-full text-sm text-gray-800" }, V = { class: "bg-gray-100" }, A = { class: "text-xs italic text-gray-400" }, N = { class: "mt-4 flex justify-between items-center" }, R = { class: "text-sm text-gray-600" }, U = { class: "flex items-center gap-2" }, H = ["disabled"], Y = ["disabled"], q = {
+import { ref as E, computed as x, watch as S, createElementBlock as d, openBlock as p, createElementVNode as t, toDisplayString as r, Fragment as h, renderList as f, renderSlot as D } from "vue";
+import { utils as g, writeFile as F } from "xlsx";
+async function I(c, e, s) {
+  const l = (await import("jspdf")).default, i = (await import("jspdf-autotable")).default, v = new l();
+  v.text(c || "Data", 10, 10), i(v, {
+    startY: 20,
+    head: [e.map((m) => m.text)],
+    body: s.map((m) => e.map((_) => m[_.value]))
+  }), v.save(`${c || "data"}.pdf`);
+}
+const L = (c, e) => {
+  const s = c.__vccOpts || c;
+  for (const [l, i] of e)
+    s[l] = i;
+  return s;
+}, $ = { class: "flex justify-between items-center mb-4" }, O = { class: "text-lg font-semibold" }, T = { class: "overflow-x-auto rounded border" }, B = { class: "min-w-full text-sm text-gray-800" }, M = { class: "bg-gray-100" }, V = { class: "text-xs italic text-gray-400" }, A = { class: "mt-4 flex justify-between items-center" }, N = { class: "text-sm text-gray-600" }, R = { class: "flex items-center gap-2" }, U = ["disabled"], H = ["disabled"], Y = {
   __name: "ExportTable",
   props: {
     title: String,
@@ -16,55 +22,50 @@ const $ = (m, e) => {
     search: String,
     perPage: { type: Number, default: 10 }
   },
-  setup(m) {
-    const e = m, a = E(1), r = v(() => {
+  setup(c) {
+    const e = c, s = E(1), l = x(() => {
       if (!e.search) return e.items;
-      const o = e.search.toLowerCase();
+      const n = e.search.toLowerCase();
       return e.items.filter(
-        (n) => Object.values(n).some(
-          (s) => typeof s == "string" && s.toLowerCase().includes(o)
+        (b) => Object.values(b).some(
+          (a) => typeof a == "string" && a.toLowerCase().includes(n)
         )
       );
     });
     console.log("✅ headers:", e.headers), console.log("✅ items:", e.items);
-    const p = v(() => Math.ceil(r.value.length / e.perPage)), x = v(() => (a.value - 1) * e.perPage), f = v(() => Math.min(a.value * e.perPage, r.value.length)), g = v(
-      () => r.value.slice(x.value, f.value)
+    const i = x(() => Math.ceil(l.value.length / e.perPage)), v = x(() => (s.value - 1) * e.perPage), m = x(() => Math.min(s.value * e.perPage, l.value.length)), _ = x(
+      () => l.value.slice(v.value, m.value)
     );
     S(() => [e.search, e.items], () => {
-      a.value = 1;
+      s.value = 1;
     });
     function k() {
-      a.value > 1 && a.value--;
+      s.value > 1 && s.value--;
     }
     function y() {
-      a.value < p.value && a.value++;
+      s.value < i.value && s.value++;
     }
     function w() {
-      const o = [e.headers.map((l) => l.text)];
-      r.value.forEach((l) => {
-        o.push(e.headers.map((C) => l[C.value]));
+      const n = [e.headers.map((o) => o.text)];
+      l.value.forEach((o) => {
+        n.push(e.headers.map((C) => o[C.value]));
       });
-      const n = o.map((l) => l.join(",")).join(`
-`), s = new Blob([n], { type: "text/csv" }), i = document.createElement("a");
-      i.href = URL.createObjectURL(s), i.download = `${e.title || "data"}.csv`, i.click();
+      const b = n.map((o) => o.join(",")).join(`
+`), a = new Blob([b], { type: "text/csv" }), u = document.createElement("a");
+      u.href = URL.createObjectURL(a), u.download = `${e.title || "data"}.csv`, u.click();
     }
     function P() {
-      const o = r.value.map(
-        (i) => Object.fromEntries(e.headers.map((l) => [l.text, i[l.value]]))
-      ), n = _.json_to_sheet(o), s = _.book_new();
-      _.book_append_sheet(s, n, "Sheet1"), F(s, `${e.title || "data"}.xlsx`);
+      const n = l.value.map(
+        (u) => Object.fromEntries(e.headers.map((o) => [o.text, u[o.value]]))
+      ), b = g.json_to_sheet(n), a = g.book_new();
+      g.book_append_sheet(a, b, "Sheet1"), F(a, `${e.title || "data"}.xlsx`);
     }
     function j() {
-      const o = new I();
-      o.text(e.title || "Data", 10, 10), L(o, {
-        startY: 20,
-        head: [e.headers.map((n) => n.text)],
-        body: r.value.map((n) => e.headers.map((s) => n[s.value]))
-      }), o.save(`${e.title || "data"}.pdf`);
+      I(e.title, e.headers, l.value);
     }
-    return (o, n) => (d(), u("div", null, [
-      t("div", O, [
-        t("h2", B, c(e.title), 1),
+    return (n, b) => (p(), d("div", null, [
+      t("div", $, [
+        t("h2", O, r(e.title), 1),
         t("div", { class: "flex gap-2" }, [
           t("button", {
             onClick: w,
@@ -80,51 +81,51 @@ const $ = (m, e) => {
           }, "PDF")
         ])
       ]),
-      t("div", M, [
-        t("table", T, [
-          t("thead", V, [
+      t("div", T, [
+        t("table", B, [
+          t("thead", M, [
             t("tr", null, [
-              (d(!0), u(b, null, h(e.headers, (s) => (d(), u("th", {
-                key: s.value,
+              (p(!0), d(h, null, f(e.headers, (a) => (p(), d("th", {
+                key: a.value,
                 class: "text-left p-2"
-              }, c(s.text), 1))), 128))
+              }, r(a.text), 1))), 128))
             ])
           ]),
           t("tbody", null, [
-            (d(!0), u(b, null, h(g.value, (s, i) => (d(), u("tr", {
-              key: s.id || i
+            (p(!0), d(h, null, f(_.value, (a, u) => (p(), d("tr", {
+              key: a.id || u
             }, [
-              (d(!0), u(b, null, h(e.headers, (l) => (d(), u("td", {
-                key: l.value,
+              (p(!0), d(h, null, f(e.headers, (o) => (p(), d("td", {
+                key: o.value,
                 class: "border-t p-2"
               }, [
-                D(o.$slots, `cell-${l.value}`, { row: s }, () => [
-                  t("span", A, "(" + c(l.value) + ")", 1)
+                D(n.$slots, `cell-${o.value}`, { row: a }, () => [
+                  t("span", V, "(" + r(o.value) + ")", 1)
                 ], !0)
               ]))), 128))
             ]))), 128))
           ])
         ])
       ]),
-      t("div", N, [
-        t("div", R, " Menampilkan " + c(x.value + 1) + "–" + c(f.value) + " dari " + c(r.value.length), 1),
-        t("div", U, [
+      t("div", A, [
+        t("div", N, " Menampilkan " + r(v.value + 1) + "–" + r(m.value) + " dari " + r(l.value.length), 1),
+        t("div", R, [
           t("button", {
             onClick: k,
-            disabled: a.value === 1,
+            disabled: s.value === 1,
             class: "btn-nav"
-          }, "<", 8, H),
-          t("span", null, "Hal. " + c(a.value) + " / " + c(p.value), 1),
+          }, "<", 8, U),
+          t("span", null, "Hal. " + r(s.value) + " / " + r(i.value), 1),
           t("button", {
             onClick: y,
-            disabled: a.value === p.value,
+            disabled: s.value === i.value,
             class: "btn-nav"
-          }, ">", 8, Y)
+          }, ">", 8, H)
         ])
       ])
     ]));
   }
-}, Q = /* @__PURE__ */ $(q, [["__scopeId", "data-v-71cb5f16"]]);
+}, G = /* @__PURE__ */ L(Y, [["__scopeId", "data-v-805c95d7"]]);
 export {
-  Q as default
+  G as default
 };

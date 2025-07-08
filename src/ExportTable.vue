@@ -51,8 +51,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { utils, writeFile } from 'xlsx'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+import { exportToPDF } from './utils/pdfexport.js'
 
 // Tangkap props ke variabel `props`
 const props =  defineProps({
@@ -135,15 +134,9 @@ function exportExcel() {
 
 // Export PDF
 function exportPDF() {
-  const doc = new jsPDF()
-  doc.text(props.title || 'Data', 10, 10)
-  autoTable(doc, {
-    startY: 20,
-    head: [props.headers.map(h => h.text)],
-    body: filteredItems.value.map(item => props.headers.map(h => item[h.value])),
-  })
-  doc.save(`${props.title || 'data'}.pdf`)
+  exportToPDF(props.title, props.headers, filteredItems.value)
 }
+
 </script>
 
 <style scoped>
