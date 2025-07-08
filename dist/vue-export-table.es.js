@@ -1,19 +1,19 @@
-import { ref as E, computed as x, watch as S, createElementBlock as d, openBlock as p, createElementVNode as t, toDisplayString as r, Fragment as h, renderList as f, renderSlot as D } from "vue";
-import { utils as g, writeFile as F } from "xlsx";
-async function I(c, e, s) {
-  const l = (await import("jspdf")).default, i = (await import("jspdf-autotable")).default, v = new l();
-  v.text(c || "Data", 10, 10), i(v, {
+import { ref as A, computed as f, watch as D, createElementBlock as p, openBlock as v, createElementVNode as r, toDisplayString as i, normalizeStyle as F, Fragment as x, renderList as y, mergeProps as $, renderSlot as I, createTextVNode as L } from "vue";
+import { utils as _, writeFile as T } from "xlsx";
+async function z(u, t, l) {
+  const c = (await import("jspdf")).default, d = (await import("jspdf-autotable")).default, b = new c();
+  b.text(u || "Data", 10, 10), d(b, {
     startY: 20,
-    head: [e.map((m) => m.text)],
-    body: s.map((m) => e.map((_) => m[_.value]))
-  }), v.save(`${c || "data"}.pdf`);
+    head: [t.map((m) => m.text)],
+    body: l.map((m) => t.map((h) => m[h.value]))
+  }), b.save(`${u || "data"}.pdf`);
 }
-const L = (c, e) => {
-  const s = c.__vccOpts || c;
-  for (const [l, i] of e)
-    s[l] = i;
-  return s;
-}, $ = { class: "flex justify-between items-center mb-4" }, O = { class: "text-lg font-semibold" }, T = { class: "overflow-x-auto rounded border" }, B = { class: "min-w-full text-sm text-gray-800" }, M = { class: "bg-gray-100" }, V = { class: "text-xs italic text-gray-400" }, A = { class: "mt-4 flex justify-between items-center" }, N = { class: "text-sm text-gray-600" }, R = { class: "flex items-center gap-2" }, U = ["disabled"], H = ["disabled"], Y = {
+const V = (u, t) => {
+  const l = u.__vccOpts || u;
+  for (const [c, d] of t)
+    l[c] = d;
+  return l;
+}, B = { class: "flex justify-between items-center mb-4" }, M = { class: "text-lg font-semibold" }, N = { class: "min-w-full text-sm text-gray-800" }, R = { class: "bg-gray-100" }, U = { class: "mt-4 flex justify-between items-center" }, H = { class: "text-sm text-gray-600" }, Y = { class: "flex items-center gap-2" }, q = ["disabled"], G = ["disabled"], J = {
   __name: "ExportTable",
   props: {
     title: String,
@@ -22,110 +22,161 @@ const L = (c, e) => {
     search: String,
     perPage: { type: Number, default: 10 }
   },
-  setup(c) {
-    const e = c, s = E(1), l = x(() => {
-      if (!e.search) return e.items;
-      const n = e.search.toLowerCase();
-      return e.items.filter(
-        (b) => Object.values(b).some(
-          (a) => typeof a == "string" && a.toLowerCase().includes(n)
+  setup(u) {
+    const t = u, l = A(1), c = f(() => {
+      if (!t.search) return t.items;
+      const o = t.search.toLowerCase();
+      return t.items.filter(
+        (n) => Object.values(n).some(
+          (e) => typeof e == "string" && e.toLowerCase().includes(o)
         )
       );
-    });
-    console.log("✅ headers:", e.headers), console.log("✅ items:", e.items);
-    const i = x(() => Math.ceil(l.value.length / e.perPage)), v = x(() => (s.value - 1) * e.perPage), m = x(() => Math.min(s.value * e.perPage, l.value.length)), _ = x(
-      () => l.value.slice(v.value, m.value)
+    }), d = f(
+      () => Math.ceil(c.value.length / t.perPage)
+    ), b = f(() => (l.value - 1) * t.perPage), m = f(
+      () => Math.min(l.value * t.perPage, c.value.length)
+    ), h = f(
+      () => c.value.slice(b.value, m.value)
     );
-    S(() => [e.search, e.items], () => {
-      s.value = 1;
-    });
-    function k() {
-      s.value > 1 && s.value--;
+    D(
+      () => [t.search, t.items],
+      () => {
+        l.value = 1;
+      }
+    );
+    function k(o, n) {
+      if (!o.sticky) return {};
+      const e = o.stickyPosition || "left", s = e === "right" ? "z-30" : "z-20", a = e === "left" ? w.value[n] || 0 : P.value.find(([g]) => g === n)?.[1] || 0;
+      return {
+        class: `sticky bg-white ${s}`,
+        style: `${e}: ${a}px; background: white;`
+      };
     }
-    function y() {
-      s.value < i.value && s.value++;
-    }
-    function w() {
-      const n = [e.headers.map((o) => o.text)];
-      l.value.forEach((o) => {
-        n.push(e.headers.map((C) => o[C.value]));
+    const w = f(() => {
+      let o = 0;
+      return !t.headers || !Array.isArray(t.headers) ? [] : t.headers.map((n) => {
+        if (n.sticky && n.stickyPosition === "left") {
+          const e = o;
+          return o += 150, e;
+        }
+        return null;
       });
-      const b = n.map((o) => o.join(",")).join(`
-`), a = new Blob([b], { type: "text/csv" }), u = document.createElement("a");
-      u.href = URL.createObjectURL(a), u.download = `${e.title || "data"}.csv`, u.click();
-    }
-    function P() {
-      const n = l.value.map(
-        (u) => Object.fromEntries(e.headers.map((o) => [o.text, u[o.value]]))
-      ), b = g.json_to_sheet(n), a = g.book_new();
-      g.book_append_sheet(a, b, "Sheet1"), F(a, `${e.title || "data"}.xlsx`);
-    }
+    }), P = f(() => {
+      let o = 0;
+      const n = t.headers, e = [];
+      if (!n || !Array.isArray(n)) return [];
+      for (let s = n.length - 1; s >= 0; s--) {
+        const a = n[s];
+        a.sticky && a.stickyPosition === "right" && (e.unshift([s, o]), o += 150);
+      }
+      return e;
+    });
     function j() {
-      I(e.title, e.headers, l.value);
+      l.value > 1 && l.value--;
     }
-    return (n, b) => (p(), d("div", null, [
-      t("div", $, [
-        t("h2", O, r(e.title), 1),
-        t("div", { class: "flex gap-2" }, [
-          t("button", {
-            onClick: w,
+    function E() {
+      l.value < d.value && l.value++;
+    }
+    function S() {
+      const o = [t.headers.map((a) => a.text)];
+      c.value.forEach((a) => {
+        o.push(t.headers.map((g) => a[g.value]));
+      });
+      const n = o.map((a) => a.join(",")).join(`
+`), e = new Blob([n], { type: "text/csv" }), s = document.createElement("a");
+      s.href = URL.createObjectURL(e), s.download = `${t.title || "data"}.csv`, s.click();
+    }
+    function C() {
+      const o = c.value.map(
+        (s) => Object.fromEntries(t.headers.map((a) => [a.text, s[a.value]]))
+      ), n = _.json_to_sheet(o), e = _.book_new();
+      _.book_append_sheet(e, n, "Sheet1"), T(e, `${t.title || "data"}.xlsx`);
+    }
+    function O() {
+      z(t.title, t.headers, c.value);
+    }
+    return (o, n) => (v(), p("div", null, [
+      r("div", B, [
+        r("h2", M, i(t.title), 1),
+        r("div", { class: "flex gap-2" }, [
+          r("button", {
+            onClick: S,
             class: "btn-export bg-emerald-500"
-          }, "CSV"),
-          t("button", {
-            onClick: P,
+          }, " CSV "),
+          r("button", {
+            onClick: C,
             class: "btn-export bg-indigo-500"
-          }, "Excel"),
-          t("button", {
-            onClick: j,
+          }, " Excel "),
+          r("button", {
+            onClick: O,
             class: "btn-export bg-rose-500"
           }, "PDF")
         ])
       ]),
-      t("div", T, [
-        t("table", B, [
-          t("thead", M, [
-            t("tr", null, [
-              (p(!0), d(h, null, f(e.headers, (a) => (p(), d("th", {
-                key: a.value,
-                class: "text-left p-2"
-              }, r(a.text), 1))), 128))
+      r("div", {
+        class: "overflow-x-auto relative rounded border",
+        style: F({
+          ...Object.fromEntries(
+            (w.value.value || []).map((e, s) => [
+              `--offset-left-${s}`,
+              `${e}px`
+            ])
+          ),
+          ...Object.fromEntries(
+            (P.value.value || []).map(([e, s]) => [
+              `--offset-right-${e}`,
+              `${s}px`
+            ])
+          )
+        })
+      }, [
+        r("table", N, [
+          r("thead", R, [
+            r("tr", null, [
+              (v(!0), p(x, null, y(t.headers, (e, s) => (v(), p("th", $({
+                key: e.value
+              }, { ref_for: !0 }, k(e, s), {
+                class: ["text-left p-2", e.class]
+              }), i(e.text), 17))), 128))
             ])
           ]),
-          t("tbody", null, [
-            (p(!0), d(h, null, f(_.value, (a, u) => (p(), d("tr", {
-              key: a.id || u
+          r("tbody", null, [
+            (v(!0), p(x, null, y(h.value, (e, s) => (v(), p("tr", {
+              key: e.id || s,
+              class: "odd:bg-white even:bg-gray-50 hover:bg-gray-100"
             }, [
-              (p(!0), d(h, null, f(e.headers, (o) => (p(), d("td", {
-                key: o.value,
-                class: "border-t p-2"
-              }, [
-                D(n.$slots, `cell-${o.value}`, { row: a }, () => [
-                  t("span", V, "(" + r(o.value) + ")", 1)
+              (v(!0), p(x, null, y(t.headers, (a, g) => (v(), p("td", $({
+                key: a.value
+              }, { ref_for: !0 }, k(a, g), {
+                class: ["border px-2 py-1 whitespace-nowrap", a.class]
+              }), [
+                I(o.$slots, `cell-${a.value}`, { row: e }, () => [
+                  L(i(e[a.value]), 1)
                 ], !0)
-              ]))), 128))
+              ], 16))), 128))
             ]))), 128))
           ])
         ])
-      ]),
-      t("div", A, [
-        t("div", N, " Menampilkan " + r(v.value + 1) + "–" + r(m.value) + " dari " + r(l.value.length), 1),
-        t("div", R, [
-          t("button", {
-            onClick: k,
-            disabled: s.value === 1,
+      ], 4),
+      r("div", U, [
+        r("div", H, " Menampilkan " + i(b.value + 1) + "–" + i(m.value) + " dari " + i(c.value.length), 1),
+        r("div", Y, [
+          r("button", {
+            onClick: j,
+            disabled: l.value === 1,
             class: "btn-nav"
-          }, "<", 8, U),
-          t("span", null, "Hal. " + r(s.value) + " / " + r(i.value), 1),
-          t("button", {
-            onClick: y,
-            disabled: s.value === i.value,
+          }, " < ", 8, q),
+          r("span", null, "Hal. " + i(l.value) + " / " + i(d.value), 1),
+          r("button", {
+            onClick: E,
+            disabled: l.value === d.value,
             class: "btn-nav"
-          }, ">", 8, H)
+          }, " > ", 8, G)
         ])
       ])
     ]));
   }
-}, G = /* @__PURE__ */ L(Y, [["__scopeId", "data-v-805c95d7"]]);
+}, W = /* @__PURE__ */ V(J, [["__scopeId", "data-v-8b5fd7bc"]]);
 export {
-  G as default
+  W as default
 };
